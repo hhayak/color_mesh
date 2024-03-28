@@ -3,7 +3,7 @@ import 'package:color_mesh/src/widgets/shader_loader.dart';
 import 'package:flutter/material.dart';
 
 /// A container that uses [gradient] as a decoration.
-/// 
+///
 /// This widget calls [MeshGradient.precacheShader] if the shader is not
 /// loaded.
 class MeshGradientContainer extends StatelessWidget {

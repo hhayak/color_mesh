@@ -8,7 +8,7 @@ import 'package:color_mesh/src/widgets/shader_loader.dart';
 
 /// A container that randomly shuffles the colors of the [gradient],
 /// with a period of [duration].
-/// 
+///
 /// This widget calls [MeshGradient.precacheShader] if the shader is not
 /// loaded.
 class AnimatedMeshGradientContainer extends StatefulWidget {
