@@ -1,6 +1,4 @@
 import 'package:color_mesh/color_mesh.dart';
-import 'package:example/gradients_grid.dart';
-import 'package:example/mesh_gradient_editor.dart';
 import 'package:flutter/material.dart';
 
 Future<void> main() async {
@@ -12,7 +10,7 @@ Future<void> main() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  final String _title = 'Color Mesh Demo';
+  final String _title = 'color_mesh Demo';
 
   @override
   Widget build(BuildContext context) {
@@ -32,28 +30,67 @@ class MeshGradientDemo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Appinio Mesh Gradient Demo'),
-          bottom: const TabBar(
-            tabs: [
-              Tab(
-                text: 'Editor',
-              ),
-              Tab(
-                text: 'Examples',
-              )
-            ],
-          ),
-        ),
-        body: TabBarView(
-          physics: const NeverScrollableScrollPhysics(),
-          children: [
-            const MeshGradientEditor(),
-            GradientsGrid(),
-          ],
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('MeshGradient Demo'),
+      ),
+      body: const MyAnimatedMeshGradient(),
+    );
+  }
+}
+
+class MyAnimatedMeshGradient extends StatefulWidget {
+  const MyAnimatedMeshGradient({super.key});
+
+  @override
+  State<MyAnimatedMeshGradient> createState() => _MyAnimatedMeshGradientState();
+}
+
+class _MyAnimatedMeshGradientState extends State<MyAnimatedMeshGradient> {
+  bool _changeGradient = false;
+
+  final MeshGradient _firstGradient = MeshGradient(
+    colors: const [
+      Colors.red,
+      Colors.green,
+      Colors.yellow,
+      Colors.blue,
+    ],
+    offsets: const [
+      Offset(0, 0), // topLeft
+      Offset(0, 1), // topRight
+      Offset(1, 0), // bottomLeft
+      Offset(1, 1), // bottomRight
+    ],
+  );
+
+  final MeshGradient _secondGradient = MeshGradient(
+    colors: const [
+      Colors.purple,
+      Colors.green,
+      Colors.orange,
+      Colors.blue,
+    ],
+    offsets: const [
+      Offset(0.3, 0.1), // topLeft
+      Offset(0, 0.8), // topRight
+      Offset(0.8, 0.3), // bottomLeft
+      Offset(1, 1), // bottomRight
+    ],
+  );
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _changeGradient = !_changeGradient;
+        });
+      },
+      child: AnimatedContainer(
+        duration: const Duration(seconds: 1),
+        decoration: BoxDecoration(
+          gradient: _changeGradient ? _firstGradient : _secondGradient,
         ),
       ),
     );

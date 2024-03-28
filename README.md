@@ -11,29 +11,80 @@ and the Flutter guide for
 [developing packages and plugins](https://flutter.dev/developing-packages).
 -->
 
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
+Provides a mesh gradient that works similarly to `LinearGradient` and `RadialGradient`. You can use `MeshGradient` in decorations and animations.
+
+* The color mesh is defined with 4 colors and 4 offsets.
+* `Web` is not supported yet :(
 
 ## Features
 
-TODO: List what your package can do. Maybe include images, gifs, or videos.
+* `MeshGradient` - a class that extends Gradient and aims to be used similarly to `RadialGradient` and `LinearGradient`.
+    * You can choose 4 colors.
+    * You can choose 4 offsets - where the colors are positioned.
+    * It supports lerping, so you can animate it with `BoxDecoration` + `AnimatedContainer` for example.
+* `MeshGradientContainer` - a simple Container with a MeshGradient decoration.
+* `AnimatedMeshGradientContainer` - an animated container that shuffles the gradient colors periodically.
+<figure>
+    <img src="screenshots/mesh.png" alt="MeshGradientContainer" width="200" height="200"/>
+    <figcaption>MeshGradientContainer</figcaption>
+</figure>
+<figure>
+    <img src="screenshots/shuffle.gif" alt="AnimatedMeshGradientContainer" width="200" height="200"/>
+    <figcaption>AnimatedMeshGradientContainer</figcaption>
+</figure>
 
 ## Getting started
 
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
+To use `MeshGradient`, you have to initialize the shader that powers it. Simply `await` for `MeshGradient.precacheShader()`
+in your app startup, or through a `FutureBuilder` for example.
+
+**Note:** `MeshGradientContainer` will load the shader on your behalf, if it wasn't done previously.
 
 ## Usage
 
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder.
+> The 'Example' tab shows how to implement an animated mesh gradient.
+
+An example using `MeshGradient` as part of the decoration for a `Container`.
 
 ```dart
-const like = 'sample';
+Future<void> main() async {
+  await MeshGradient.precacheShader();
+  runApp(const MyApp());
+}
+
+// ... MyApp() ...
+
+class MyMeshContainer extends StatelessWidget {
+  const MyMeshContainer({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: MeshGradient(
+          colors: const [
+            Colors.red,
+            Colors.green,
+            Colors.yellow,
+            Colors.blue,
+          ],
+          offsets: const [
+            Offset(0, 0), // topLeft
+            Offset(0, 1), // topRight
+            Offset(1, 0), // bottomLeft
+            Offset(1, 1), // bottomRight
+          ],
+        ),
+      ),
+    );
+  }
+}
 ```
 
 ## Additional information
 
-TODO: Tell users more about the package: where to find more information, how to
-contribute to the package, how to file issues, what response they can expect
-from the package authors, and more.
+Any contribution is welcome! 
+
+You can use the Github repository to report bugs by opening issues, or help implement new features by opening new pull requests. 
+
+Thank you!
