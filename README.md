@@ -40,6 +40,13 @@ Provides a mesh gradient that works similarly to `LinearGradient` and `RadialGra
 To use `MeshGradient`, you have to initialize the shader that powers it. Simply `await` for `MeshGradient.precacheShader()`
 in your app startup, or through a `FutureBuilder` for example.
 
+```dart
+Future<void> main() async {
+  await MeshGradient.precacheShader();
+  runApp(const MyApp());
+}
+```
+
 **Note:** `MeshGradientContainer` will load the shader on your behalf, if it wasn't done previously.
 
 ## Usage
