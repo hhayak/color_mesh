@@ -18,16 +18,18 @@ Provides a mesh gradient that works similarly to `LinearGradient` and `RadialGra
 
 ## Features
 
-* `MeshGradient` - a class that extends Gradient and aims to be used similarly to `RadialGradient` and `LinearGradient`.
+* `MeshGradient` - a class that extends `Gradient` and aims to be used similarly to `RadialGradient` and `LinearGradient`.
     * You can choose 4 colors.
     * You can choose 4 offsets - where the colors are positioned.
     * It supports lerping, so you can animate it with `BoxDecoration` + `AnimatedContainer` for example.
 * `MeshGradientContainer` - a simple Container with a MeshGradient decoration.
 * `AnimatedMeshGradientContainer` - an animated container that shuffles the gradient colors periodically.
+
 <figure>
     <img src="screenshots/mesh.png" alt="MeshGradientContainer" width="200" height="200"/>
     <figcaption>MeshGradientContainer</figcaption>
 </figure>
+
 <figure>
     <img src="screenshots/shuffle.gif" alt="AnimatedMeshGradientContainer" width="200" height="200"/>
     <figcaption>AnimatedMeshGradientContainer</figcaption>

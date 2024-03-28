@@ -1,3 +1,4 @@
+/// Exposes [MeshGradient] and supporting widgets.
 library color_mesh;
 
 export 'src/mesh_gradient.dart';
