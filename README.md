@@ -26,12 +26,12 @@ Provides a mesh gradient that works similarly to `LinearGradient` and `RadialGra
 * `AnimatedMeshGradientContainer` - an animated container that shuffles the gradient colors periodically.
 
 <figure>
-    <img src="screenshots/mesh.png" alt="MeshGradientContainer" width="200" height="200"/>
+    <img src="https://raw.githubusercontent.com/hhayak/color_mesh/main/screenshots/mesh.png" alt="MeshGradientContainer" width="200" height="200"/>
     <figcaption>MeshGradientContainer</figcaption>
 </figure>
 
 <figure>
-    <img src="screenshots/shuffle.gif" alt="AnimatedMeshGradientContainer" width="200" height="200"/>
+    <img src="https://raw.githubusercontent.com/hhayak/color_mesh/main/screenshots/shuffle.gif" alt="AnimatedMeshGradientContainer" width="200" height="200"/>
     <figcaption>AnimatedMeshGradientContainer</figcaption>
 </figure>
 
