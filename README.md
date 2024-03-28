@@ -14,7 +14,7 @@ and the Flutter guide for
 Provides a mesh gradient that works similarly to `LinearGradient` and `RadialGradient`. You can use `MeshGradient` in decorations and animations.
 
 * The color mesh is defined with 4 colors and 4 offsets.
-* `Web` is not supported yet :(
+* `Web` is not supported yet :( - watching how this [issue](https://github.com/flutter/flutter/issues/144503) develops
 
 ## Features
 
