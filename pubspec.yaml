@@ -1,6 +1,6 @@
 name: color_mesh
 description: A mesh (multi-point) gradient that can be used like RadialGradient and LinearGradient.
-version: 0.0.2
+version: 0.0.3
 homepage: https://github.com/hhayak/color_mesh
 
 environment:
@@ -21,6 +21,8 @@ flutter:
     - shaders/mesh_gradient.frag
 
 screenshots:
+  - description: 'An example mesh gradient.'
+    path: screenshots/mesh_yellow.png
   - description: 'An example mesh gradient.'
     path: screenshots/mesh.png
   - description: 'An animated mesh gradient, using AnimatedContainer and shuffling the same 4 colors.'
