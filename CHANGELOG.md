@@ -1,6 +1,11 @@
 <!--
 dart pub publish --dry-run
  -->
+
+## 0.0.5
+
+* Fix missing child in `AnimatedMeshGradientContainer`.
+
 ## 0.0.4
 
 * Update README with blog link and more details about the web support.

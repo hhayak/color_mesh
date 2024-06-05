@@ -87,10 +87,11 @@ class _MyAnimatedMeshGradientState extends State<MyAnimatedMeshGradient> {
           _changeGradient = !_changeGradient;
         });
       },
-      child: AnimatedContainer(
-        duration: const Duration(seconds: 1),
-        decoration: BoxDecoration(
-          gradient: _changeGradient ? _firstGradient : _secondGradient,
+      child: AnimatedMeshGradientContainer(
+        duration: const Duration(seconds: 3),
+        gradient: _changeGradient ? _firstGradient : _secondGradient,
+        child: const Center(
+          child: Text('Tap to change gradients'),
         ),
       ),
     );

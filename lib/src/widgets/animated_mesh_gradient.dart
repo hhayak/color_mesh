@@ -12,13 +12,13 @@ import 'package:color_mesh/src/widgets/shader_loader.dart';
 /// This widget calls [MeshGradient.precacheShader] if the shader is not
 /// loaded.
 class AnimatedMeshGradientContainer extends StatefulWidget {
-  final MeshGradient gradient;
+  final MeshGradient? gradient;
   final Duration duration;
   final Widget? child;
 
   const AnimatedMeshGradientContainer({
     super.key,
-    required this.gradient,
+    this.gradient,
     this.duration = const Duration(seconds: 3),
     this.child,
   });
@@ -30,7 +30,7 @@ class AnimatedMeshGradientContainer extends StatefulWidget {
 
 class _AnimatedMeshGradientContainerState
     extends State<AnimatedMeshGradientContainer> {
-  late MeshGradient _gradient;
+  MeshGradient? _gradient;
   Timer? _timer;
 
   @override
@@ -45,9 +45,18 @@ class _AnimatedMeshGradientContainerState
     });
   }
 
+  @override
+  void didUpdateWidget(covariant AnimatedMeshGradientContainer oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.gradient != widget.gradient) {
+      _gradient = widget.gradient;
+      _shuffleGradient();
+    }
+  }
+
   void _shuffleGradient() {
     setState(() {
-      _gradient = _gradient.shuffle();
+      _gradient = _gradient?.shuffle();
     });
   }
 
@@ -62,9 +71,8 @@ class _AnimatedMeshGradientContainerState
     return ShaderLoader(
       builder: (context, init) => AnimatedContainer(
         duration: widget.duration,
-        decoration: BoxDecoration(
-          gradient: init ? _gradient : null,
-        ),
+        decoration: init ? BoxDecoration(gradient: _gradient) : null,
+        child: widget.child,
       ),
     );
   }
