@@ -2,6 +2,10 @@
 dart pub publish --dry-run
  -->
 
+## 0.0.6
+
+* Add Web support tag on pub.dev.
+
 ## 0.0.5
 
 * Fix missing child in `AnimatedMeshGradientContainer`.
