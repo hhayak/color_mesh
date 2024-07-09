@@ -1,6 +1,6 @@
 name: color_mesh
 description: A mesh (multi-point) gradient that can be used like RadialGradient and LinearGradient.
-version: 0.0.6
+version: 0.0.7
 homepage: https://github.com/hhayak/color_mesh
 
 environment:
