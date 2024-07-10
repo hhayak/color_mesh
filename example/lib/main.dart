@@ -1,5 +1,7 @@
-import 'package:color_mesh/color_mesh.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+
+import 'package:color_mesh/color_mesh.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,79 +22,102 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MeshGradientDemo(),
+      home: const MeshPlayground(),
     );
   }
 }
 
-class MeshGradientDemo extends StatelessWidget {
-  const MeshGradientDemo({super.key});
+class MeshPlayground extends StatefulWidget {
+  const MeshPlayground({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('MeshGradient Demo'),
-      ),
-      body: const MyAnimatedMeshGradient(),
+  State<MeshPlayground> createState() => _MeshPlaygroundState();
+}
+
+class _MeshPlaygroundState extends State<MeshPlayground> {
+  final List<Offset> _offsets = [
+    const Offset(0.1, 0.3),
+    const Offset(0.15, 0.6),
+    const Offset(0.6, 0.1),
+    const Offset(0.85, 0.8),
+  ];
+
+  late MeshGradient _gradient;
+
+  @override
+  void initState() {
+    super.initState();
+    _gradient = MeshGradient(
+      colors: const [
+        Colors.red,
+        Colors.yellow,
+        Colors.green,
+        Colors.blue,
+      ],
+      offsets: _offsets,
     );
   }
-}
-
-class MyAnimatedMeshGradient extends StatefulWidget {
-  const MyAnimatedMeshGradient({super.key});
-
-  @override
-  State<MyAnimatedMeshGradient> createState() => _MyAnimatedMeshGradientState();
-}
-
-class _MyAnimatedMeshGradientState extends State<MyAnimatedMeshGradient> {
-  bool _changeGradient = false;
-
-  final MeshGradient _firstGradient = MeshGradient(
-    colors: const [
-      Colors.red,
-      Colors.green,
-      Colors.yellow,
-      Colors.blue,
-    ],
-    offsets: const [
-      Offset(0, 0), // topLeft
-      Offset(0, 1), // topRight
-      Offset(1, 0), // bottomLeft
-      Offset(1, 1), // bottomRight
-    ],
-  );
-
-  final MeshGradient _secondGradient = MeshGradient(
-    colors: const [
-      Colors.purple,
-      Colors.green,
-      Colors.orange,
-      Colors.blue,
-    ],
-    offsets: const [
-      Offset(0.3, 0.1), // topLeft
-      Offset(0, 0.8), // topRight
-      Offset(0.8, 0.3), // bottomLeft
-      Offset(1, 1), // bottomRight
-    ],
-  );
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          _changeGradient = !_changeGradient;
-        });
-      },
-      child: AnimatedMeshGradientContainer(
-        duration: const Duration(seconds: 3),
-        gradient: _changeGradient ? _firstGradient : _secondGradient,
-        child: const Center(
-          child: Text('Tap to change gradients'),
+    return Stack(
+      children: [
+        DragTarget<int>(
+          onMove: (details) {
+            final RenderBox box = context.findRenderObject() as RenderBox;
+            final Offset offset = Offset(
+              details.offset.dx / box.size.width,
+              details.offset.dy / box.size.height,
+            );
+            setState(() {
+              _offsets[details.data] = offset;
+              _gradient = _gradient.copyWith(
+                offsets: _offsets,
+              );
+            });
+          },
+          builder: (context, candidateData, rejectedData) => RepaintBoundary(
+            child: AnimatedContainer(
+              key: ValueKey(_gradient.hashCode),
+              alignment: Alignment.center,
+              duration: const Duration(milliseconds: 300),
+              decoration: BoxDecoration(
+                gradient: _gradient,
+              ),
+            ),
+          ),
         ),
+        ..._offsets.mapIndexed(
+          (i, e) => Align(
+            alignment: FractionalOffset(e.dx, e.dy),
+            child: Draggable<int>(
+              data: i,
+              childWhenDragging: const SizedBox.shrink(),
+              feedback: const Handle(),
+              child: const Handle(),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class Handle extends StatelessWidget {
+  final Color color;
+  const Handle({
+    super.key,
+    this.color = Colors.black,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 15,
+      height: 15,
+      decoration: BoxDecoration(
+        color: color,
+        shape: BoxShape.circle,
       ),
     );
   }

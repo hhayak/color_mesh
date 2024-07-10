@@ -11,6 +11,7 @@ dependencies:
     sdk: flutter
   color_mesh:
     path: ../
+  collection: ^1.18.0
   
 
 dev_dependencies:
