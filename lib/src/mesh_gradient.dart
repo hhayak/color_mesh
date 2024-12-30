@@ -89,9 +89,9 @@ class MeshGradient extends Gradient {
     //colors
     for (Color color in colors) {
       shaderController.setVec3(
-        color.red / 255,
-        color.green / 255,
-        color.blue / 255,
+        color.r / 255,
+        color.g / 255,
+        color.b / 255,
       );
     }
     //offsets
@@ -220,6 +220,15 @@ class MeshGradient extends Gradient {
     return MeshGradient(
       colors: colors ?? this.colors,
       offsets: offsets ?? this.offsets,
+    );
+  }
+
+  @override
+  Gradient withOpacity(double opacity) {
+    return copyWith(
+      colors: <Color>[
+        for (final Color color in colors) color.withValues(alpha: opacity)
+      ],
     );
   }
 }

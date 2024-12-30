@@ -1,4 +1,8 @@
 <!--dart pub publish --dry-run-->
+## 0.0.8
+
+- Implemented `.withOpacity` for `MeshGradient`, added part of Flutter 3.27.
+- Increased minimum Flutter SDK version to `3.27.0`
 
 ## 0.0.7
 

@@ -1,11 +1,11 @@
 name: color_mesh
 description: A mesh (multi-point) gradient that can be used like RadialGradient and LinearGradient.
-version: 0.0.7
+version: 0.0.8
 homepage: https://github.com/hhayak/color_mesh
 
 environment:
   sdk: '>=3.1.3 <4.0.0'
-  flutter: ">=1.17.0"
+  flutter: ">=3.27.0"
 
 dependencies:
   flutter:
@@ -32,7 +32,7 @@ topics:
   - mesh
   - gradient
   - color
-  - ui
+  - decoration
   - animation
 
 platforms:
