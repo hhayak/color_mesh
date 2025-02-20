@@ -89,9 +89,9 @@ class MeshGradient extends Gradient {
     //colors
     for (Color color in colors) {
       shaderController.setVec3(
-        color.r / 255,
-        color.g / 255,
-        color.b / 255,
+        color.r,
+        color.g,
+        color.b,
       );
     }
     //offsets
