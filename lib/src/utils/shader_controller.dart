@@ -23,4 +23,11 @@ class ShaderController {
     setFloat(y);
     setFloat(z);
   }
+
+  void setVec4(double x, double y, double z, double w) {
+    setFloat(x);
+    setFloat(y);
+    setFloat(z);
+    setFloat(w);
+  }
 }

@@ -2,6 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
 import 'package:color_mesh/color_mesh.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -35,70 +36,176 @@ class MeshPlayground extends StatefulWidget {
 }
 
 class _MeshPlaygroundState extends State<MeshPlayground> {
-  final List<Offset> _offsets = [
-    const Offset(0.1, 0.3),
-    const Offset(0.15, 0.6),
-    const Offset(0.6, 0.1),
-    const Offset(0.85, 0.8),
+  final List<MeshColor> _meshColors = [
+    const MeshColor(color: Colors.red, offset: Offset(0.2, 0)),
+    const MeshColor(color: Colors.yellow, offset: Offset(0.8, 0)),
+    const MeshColor(color: Colors.green, offset: Offset(0, 1)),
+    const MeshColor(color: Colors.blue, offset: Offset(1, 1)),
+    const MeshColor(color: Colors.deepPurple, offset: Offset(0.5, 0.5)),
+    const MeshColor(color: Colors.orange, offset: Offset(0.8, 0.5)),
+    const MeshColor(color: Colors.pink, offset: Offset(0.5, 0.4)),
+    const MeshColor(color: Colors.teal, offset: Offset(0.22, 0.3)),
   ];
 
-  late MeshGradient _gradient;
+  int _selectedColorIndex = 0;
 
-  @override
-  void initState() {
-    super.initState();
-    _gradient = MeshGradient(
-      colors: const [
-        Colors.red,
-        Colors.yellow,
-        Colors.green,
-        Colors.blue,
-      ],
-      offsets: _offsets,
+  void _showColorPicker(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Pick a color'),
+          content: SingleChildScrollView(
+            child: ColorPicker(
+              pickerColor: _meshColors[_selectedColorIndex].color,
+              onColorChanged: (color) {
+                setState(() {
+                  _meshColors[_selectedColorIndex] =
+                      _meshColors[_selectedColorIndex].copyWith(color: color);
+                });
+              },
+            ),
+          ),
+          actions: <Widget>[
+            ElevatedButton(
+              child: const Text('Done'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        DragTarget<int>(
-          onMove: (details) {
-            final RenderBox box = context.findRenderObject() as RenderBox;
-            final Offset offset = Offset(
-              details.offset.dx / box.size.width,
-              details.offset.dy / box.size.height,
-            );
-            setState(() {
-              _offsets[details.data] = offset;
-              _gradient = _gradient.copyWith(
-                offsets: _offsets,
-              );
-            });
-          },
-          builder: (context, candidateData, rejectedData) => RepaintBoundary(
-            child: AnimatedContainer(
-              key: ValueKey(_gradient.hashCode),
-              alignment: Alignment.center,
-              duration: const Duration(milliseconds: 300),
-              decoration: BoxDecoration(
-                gradient: _gradient,
+    return Scaffold(
+      body: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+              child: Stack(
+                children: [
+                  DragTarget<int>(
+                    onMove: (details) {
+                      final RenderBox box =
+                          context.findRenderObject() as RenderBox;
+                      final Offset offset = Offset(
+                        details.offset.dx / box.size.width,
+                        details.offset.dy / box.size.height,
+                      );
+
+                      setState(() {
+                        _meshColors[details.data] =
+                            _meshColors[details.data].copyWith(
+                          offset: offset,
+                        );
+                      });
+                    },
+                    builder: (context, candidateData, rejectedData) =>
+                        RepaintBoundary(
+                      child: AnimatedContainer(
+                        alignment: Alignment.center,
+                        duration: const Duration(milliseconds: 300),
+                        decoration: BoxDecoration(
+                          gradient: MeshGradient(
+                            colors: _meshColors.map((e) => e.color).toList(),
+                            offsets: _meshColors.map((e) => e.offset).toList(),
+                            strengths:
+                                _meshColors.map((e) => e.strength).toList(),
+                            sigmas: _meshColors.map((e) => e.sigma).toList(),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  ..._meshColors.mapIndexed(
+                    (i, e) => Align(
+                      alignment: FractionalOffset(e.offset.dx, e.offset.dy),
+                      child: Draggable<int>(
+                        data: i,
+                        childWhenDragging: const SizedBox.shrink(),
+                        feedback: Handle(
+                          color: _selectedColorIndex == i
+                              ? Colors.white
+                              : Colors.black,
+                        ),
+                        onDragStarted: () {
+                          setState(() {
+                            _selectedColorIndex = i;
+                          });
+                        },
+                        child: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _selectedColorIndex = i;
+                            });
+                            _showColorPicker(context);
+                          },
+                          child: Handle(
+                            color: _selectedColorIndex == i
+                                ? Colors.white
+                                : Colors.black,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ),
-        ),
-        ..._offsets.mapIndexed(
-          (i, e) => Align(
-            alignment: FractionalOffset(e.dx, e.dy),
-            child: Draggable<int>(
-              data: i,
-              childWhenDragging: const SizedBox.shrink(),
-              feedback: const Handle(),
-              child: const Handle(),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      const Text('Weight'),
+                      Expanded(
+                        child: Slider(
+                          value: _meshColors[_selectedColorIndex].strength,
+                          min: 0,
+                          max: 1,
+                          onChanged: (value) {
+                            setState(() {
+                              _meshColors[_selectedColorIndex] =
+                                  _meshColors[_selectedColorIndex]
+                                      .copyWith(strength: value);
+                            });
+                          },
+                          label: 'Strength',
+                        ),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      const Text('Sigma'),
+                      Expanded(
+                        child: Slider(
+                          value: _meshColors[_selectedColorIndex].sigma,
+                          min: 0,
+                          max: 1,
+                          onChanged: (value) {
+                            setState(() {
+                              _meshColors[_selectedColorIndex] =
+                                  _meshColors[_selectedColorIndex]
+                                      .copyWith(sigma: value);
+                            });
+                          },
+                          label: 'Sigma',
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
-          ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }
@@ -119,6 +226,34 @@ class Handle extends StatelessWidget {
         color: color,
         shape: BoxShape.circle,
       ),
+    );
+  }
+}
+
+class MeshColor {
+  final Color color;
+  final Offset offset;
+  final double strength;
+  final double sigma;
+
+  const MeshColor({
+    required this.color,
+    required this.offset,
+    this.strength = 1,
+    this.sigma = 0.25,
+  });
+
+  MeshColor copyWith({
+    Color? color,
+    Offset? offset,
+    double? strength,
+    double? sigma,
+  }) {
+    return MeshColor(
+      color: color ?? this.color,
+      offset: offset ?? this.offset,
+      strength: strength ?? this.strength,
+      sigma: sigma ?? this.sigma,
     );
   }
 }

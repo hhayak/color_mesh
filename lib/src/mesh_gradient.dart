@@ -6,31 +6,39 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:color_mesh/src/utils/shader_controller.dart';
-import 'package:color_mesh/src/utils/utils.dart';
 
-/// [colors] are the 4 [Color]s that will be used to create the gradient.
+/// [colors] are the [Color]s that will be used to create the gradient.
 ///
-/// [offsets] are the 4 [Offset]s where each color is placed. Offset(0, 0)
+/// [offsets] are the [Offset]s where each color is placed. Offset(0, 0)
 /// corresponds to the top left.
-///
+/// 
+/// [strengths] are the weight of each color. Controls the prominence or 
+/// intensity of each color in the gradient
+/// 
+/// [sigmas] are the spread of each color. Controls the spread range of each color.
+/// 
 /// [MeshGradient.precacheShader] must be called before using this gradient.
 /// If not, the gradient will be transparent.
 class MeshGradient extends Gradient {
   final List<Offset> offsets;
+  final List<double> strengths;
+  final List<double> sigmas;
 
   static ui.FragmentProgram? _cachedFragmentProgram;
 
   static const _assetKey = 'packages/color_mesh/shaders/mesh_gradient.frag';
 
+  static const _shaderMaxPoints = 8;
+
   const MeshGradient({
     required super.colors,
-    this.offsets = const [
-      Offset(0, 0),
-      Offset(0, 1),
-      Offset(1, 0),
-      Offset(1, 1),
-    ],
-  }) : assert(colors.length == 4 && offsets.length == colors.length);
+    required this.offsets,
+    required this.strengths,
+    required this.sigmas,
+  })  : assert(colors.length <= _shaderMaxPoints),
+        assert(offsets.length == colors.length),
+        assert(strengths.length == colors.length),
+        assert(sigmas.length == colors.length);
 
   static bool get initialised => _cachedFragmentProgram != null;
 
@@ -70,55 +78,66 @@ class MeshGradient extends Gradient {
       return transparentGradient.createShader(rect);
     }
 
-    final shaderController = ShaderController(fragmentProgram);
+    final controller = ShaderController(fragmentProgram);
+
     final size = rect.size;
-    final centeredOffsets = _centerOffsets(offsets);
-    final colorSrc = [
-      [-0.85, -0.9],
-      [-0.95, 0.9],
-      [0.85, -0.9],
-      [0.95, 0.9],
+
+    // Set iResolution
+    controller.setVec2(size.width, size.height);
+
+    // Set numPoints
+    final int numPoints = colors.length;
+    controller.setFloat(numPoints.toDouble());
+
+    // Pre-pad lists to _shaderMaxPoints with default values
+    final paddedOffsets = [
+      ...offsets,
+      ...List.filled(_shaderMaxPoints - offsets.length, Offset.zero)
     ];
 
-    final (H, s2) = MathUtils.rbf(centeredOffsets, centeredOffsets, true);
-    final w = MathUtils.linsolve(H, colorSrc);
+    final paddedColors = [
+      ...colors,
+      ...List.filled(_shaderMaxPoints - colors.length, Colors.transparent)
+    ];
 
-    //uSize
-    shaderController.setFloat(size.width);
-    shaderController.setFloat(size.height);
-    //colors
-    for (Color color in colors) {
-      shaderController.setVec3(
-        color.r,
-        color.g,
-        color.b,
+    final paddedStrengths = [
+      ...strengths,
+      ...List.filled(_shaderMaxPoints - strengths.length, 1.0)
+    ];
+
+    final paddedSigmas = [
+      ...sigmas,
+      ...List.filled(_shaderMaxPoints - sigmas.length, 0.1)
+    ];
+
+    for (int i = 0; i < _shaderMaxPoints; i++) {
+      controller.setVec2(paddedOffsets[i].dx, paddedOffsets[i].dy);
+    }
+
+    for (int i = 0; i < _shaderMaxPoints; i++) {
+      controller.setVec4(
+        paddedColors[i].r,
+        paddedColors[i].g,
+        paddedColors[i].b,
+        paddedColors[i].a,
       );
     }
-    //offsets
-    for (Offset offset in centeredOffsets) {
-      shaderController.setVec2(offset.dx, offset.dy);
-    }
-    // s2
-    for (var s in s2) {
-      shaderController.setFloat(s);
-    }
-    // w
-    for (var weight in w) {
-      shaderController.setVec2(weight[0], weight[1]);
+
+    for (int i = 0; i < _shaderMaxPoints; i++) {
+      controller.setFloat(paddedStrengths[i]);
     }
 
-    return shaderController.shader;
-  }
+    for (int i = 0; i < _shaderMaxPoints; i++) {
+      controller.setFloat(paddedSigmas[i]);
+    }
 
-  List<Offset> _centerOffsets(List<Offset> offset) {
-    return offsets.map((e) => Offset(e.dx * 2 - 1, e.dy * 2 - 1)).toList();
+    return controller.shader;
   }
 
   @override
   MeshGradient scale(double factor) {
-    return MeshGradient(
+    return copyWith(
       colors: colors.map((color) => Color.lerp(null, color, factor)!).toList(),
-      offsets: offsets,
     );
   }
 
@@ -148,37 +167,29 @@ class MeshGradient extends Gradient {
     if (b == null) {
       return a.scale(1.0 - t);
     }
-    final interpolated = _interpolateColorsAndOffsets(
-      a.colors,
-      a.offsets,
-      b.colors,
-      b.offsets,
-      t,
-    );
-    return MeshGradient(
-      colors: interpolated.$1,
-      offsets: interpolated.$2,
-    );
-  }
 
-  static (List<Color>, List<Offset>) _interpolateColorsAndOffsets(
-    List<Color> aColors,
-    List<Offset> aOffsets,
-    List<Color> bColors,
-    List<Offset> bOffsets,
-    double t,
-  ) {
-    assert(aColors.length == 4);
-    assert(bColors.length == aColors.length);
-    assert(aOffsets.length == aColors.length);
-    assert(bOffsets.length == aColors.length);
-    final List<Color> interpolatedColors = <Color>[];
-    final List<Offset> interpolatedOffsets = <Offset>[];
-    for (int i = 0; i < aColors.length; i++) {
-      interpolatedColors.add(Color.lerp(aColors[i], bColors[i], t)!);
-      interpolatedOffsets.add(Offset.lerp(aOffsets[i], bOffsets[i], t)!);
+    final colors = <Color>[];
+    final offsets = <Offset>[];
+    final strengths = <double>[];
+    final sigmas = <double>[];
+
+    for (int i = 0; i < a.colors.length; i++) {
+      colors.add(Color.lerp(
+          a.colors.elementAtOrNull(i), b.colors.elementAtOrNull(i), t)!);
+      offsets.add(Offset.lerp(
+          a.offsets.elementAtOrNull(i), b.offsets.elementAtOrNull(i), t)!);
+      strengths.add(ui.lerpDouble(
+          a.strengths.elementAtOrNull(i), b.strengths.elementAtOrNull(i), t)!);
+      sigmas.add(ui.lerpDouble(
+          a.sigmas.elementAtOrNull(i), b.sigmas.elementAtOrNull(i), t)!);
     }
-    return (interpolatedColors, interpolatedOffsets);
+
+    return MeshGradient(
+      colors: colors,
+      offsets: offsets,
+      strengths: strengths,
+      sigmas: sigmas,
+    );
   }
 
   @override
@@ -192,7 +203,9 @@ class MeshGradient extends Gradient {
     return other is MeshGradient &&
         other.transform == transform &&
         listEquals<Color>(other.colors, colors) &&
-        listEquals<Offset>(other.offsets, offsets);
+        listEquals<Offset>(other.offsets, offsets) &&
+        listEquals<double>(other.strengths, strengths) &&
+        listEquals<double>(other.sigmas, sigmas);
   }
 
   @override
@@ -200,6 +213,8 @@ class MeshGradient extends Gradient {
         transform,
         Object.hashAll(colors),
         Object.hashAll(offsets),
+        Object.hashAll(strengths),
+        Object.hashAll(sigmas),
       );
 
   @override
@@ -207,6 +222,8 @@ class MeshGradient extends Gradient {
     final List<String> description = <String>[
       'colors: $colors',
       'offset: $offsets',
+      'strengths: $strengths',
+      'sigmas: $sigmas',
       if (transform != null) 'transform: $transform',
     ];
 
@@ -216,10 +233,14 @@ class MeshGradient extends Gradient {
   MeshGradient copyWith({
     List<Color>? colors,
     List<Offset>? offsets,
+    List<double>? strengths,
+    List<double>? sigmas,
   }) {
     return MeshGradient(
       colors: colors ?? this.colors,
       offsets: offsets ?? this.offsets,
+      strengths: strengths ?? this.strengths,
+      sigmas: sigmas ?? this.sigmas,
     );
   }
 

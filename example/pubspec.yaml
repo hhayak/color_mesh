@@ -12,6 +12,7 @@ dependencies:
   color_mesh:
     path: ../
   collection: ^1.18.0
+  flutter_colorpicker: ^1.1.0
   
 
 dev_dependencies:

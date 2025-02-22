@@ -1,4 +1,9 @@
 <!--dart pub publish --dry-run-->
+## 1.0.0
+
+- Reworked the shader to accept up to 8 colors, their offsets, their strength and their sigma values.
+- **Breaking Change:** `MeshGradient` requires two extra parameters, `strengths` & `sigmas`.
+
 ## 0.0.9
 
 - Fix Color RGB values.

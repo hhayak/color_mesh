@@ -16,29 +16,76 @@ void main() {
       Offset(0, 1),
       Offset(1, 1),
     ];
+    const strengths = [1.0, 1.0, 1.0, 1.0];
+    const sigmas = [0.5, 0.5, 0.5, 0.5];
 
     test('should create MeshGradient', () {
-      final gradient = MeshGradient(colors: colors, offsets: offsets);
+      final gradient = MeshGradient(
+        colors: colors,
+        offsets: offsets,
+        strengths: strengths,
+        sigmas: sigmas,
+      );
       expect(gradient, isNotNull);
     });
 
     test('should fail when colors and offsets length mismatch', () {
-      expect(() => MeshGradient(colors: colors, offsets: offsets.sublist(0, 2)),
+      expect(
+          () => MeshGradient(
+                colors: colors,
+                offsets: offsets.sublist(0, 2),
+                strengths: strengths,
+                sigmas: sigmas,
+              ),
+          throwsAssertionError);
+    });
+
+    test('should fail when colors and strengths length mismatch', () {
+      expect(
+          () => MeshGradient(
+                colors: colors,
+                offsets: offsets,
+                strengths: strengths.sublist(0, 2),
+                sigmas: sigmas,
+              ),
+          throwsAssertionError);
+    });
+
+    test('should fail when colors and sigmas length mismatch', () {
+      expect(
+          () => MeshGradient(
+                colors: colors,
+                offsets: offsets,
+                strengths: strengths,
+                sigmas: sigmas.sublist(0, 2),
+              ),
           throwsAssertionError);
     });
 
     test('should not create shader before fragment program precache', () {
-      final gradient = MeshGradient(colors: colors, offsets: offsets);
+      final gradient = MeshGradient(
+        colors: colors,
+        offsets: offsets,
+        strengths: strengths,
+        sigmas: sigmas,
+      );
       expect(() {
         gradient.createShader(Rect.zero);
       }, throwsAssertionError);
     });
 
     test('should correctly lerp between two MeshGradients', () {
-      final gradient = MeshGradient(colors: colors, offsets: offsets);
+      final gradient = MeshGradient(
+        colors: colors,
+        offsets: offsets,
+        strengths: strengths,
+        sigmas: sigmas,
+      );
       final target = MeshGradient(
         colors: colors.reversed.toList(),
         offsets: offsets.reversed.toList(),
+        strengths: strengths.reversed.toList(),
+        sigmas: sigmas.reversed.toList(),
       );
       const t = 0.7;
 
@@ -73,6 +120,8 @@ void main() {
         Offset(1, 0), // bottomLeft
         Offset(1, 1), // bottomRight
       ],
+      strengths: const [1.0, 1.0, 1.0, 1.0],
+      sigmas: const [0.5, 0.5, 0.5, 0.5],
     );
 
     await tester.pumpWidget(Container(
