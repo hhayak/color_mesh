@@ -1,4 +1,8 @@
 <!--dart pub publish --dry-run-->
+## 1.0.1
+
+- Update README.
+
 ## 1.0.0
 
 - Reworked the shader to accept up to 8 colors, their offsets, their strength and their sigma values.

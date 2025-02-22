@@ -15,14 +15,13 @@ Provides a mesh gradient that works similarly to `LinearGradient` and `RadialGra
 
 > You can check a live preview in this blog [post](https://www.hamzahayak.dev/blog/color-mesh)!
 
-* The color mesh is defined with 4 colors and 4 offsets.
-* `Web` is supported in Flutter versions `< 3.19` - watching how this [issue](https://github.com/flutter/flutter/issues/144503) develops
-
 ## Features
 
 * `MeshGradient` - a class that extends `Gradient` and aims to be used similarly to `RadialGradient` and `LinearGradient`.
-    * You can choose 4 colors.
-    * You can choose 4 offsets - where the colors are positioned.
+    * You can choose up to 8 `colors`.
+    * You can choose the `offsets` - where the colors are positioned.
+    * You can chhose the `strengths` - how dominant each color is.
+    * You can choose the `sigmas` - the spread range of each color.
     * It supports lerping, so you can animate it with `BoxDecoration` + `AnimatedContainer` for example.
 * `MeshGradientContainer` - a simple Container with a MeshGradient decoration.
 * `AnimatedMeshGradientContainer` - an animated container that shuffles the gradient colors periodically.
@@ -85,6 +84,8 @@ class MyMeshContainer extends StatelessWidget {
             Offset(1, 0), // bottomLeft
             Offset(1, 1), // bottomRight
           ],
+          strengths: const [1, 1, 1, 1],
+          sigmas: const [0.3, 0,2, 0.3, 0.25],
         ),
       ),
     );
