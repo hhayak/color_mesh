@@ -11,12 +11,12 @@ import 'package:color_mesh/src/utils/shader_controller.dart';
 ///
 /// [offsets] are the [Offset]s where each color is placed. Offset(0, 0)
 /// corresponds to the top left.
-/// 
-/// [strengths] are the weight of each color. Controls the prominence or 
+///
+/// [strengths] are the weight of each color. Controls the prominence or
 /// intensity of each color in the gradient
-/// 
+///
 /// [sigmas] are the spread of each color. Controls the spread range of each color.
-/// 
+///
 /// [MeshGradient.precacheShader] must be called before using this gradient.
 /// If not, the gradient will be transparent.
 class MeshGradient extends Gradient {
@@ -97,7 +97,7 @@ class MeshGradient extends Gradient {
 
     final paddedColors = [
       ...colors,
-      ...List.filled(_shaderMaxPoints - colors.length, Colors.transparent)
+      ...List.filled(_shaderMaxPoints - colors.length, Colors.black)
     ];
 
     final paddedStrengths = [
@@ -112,9 +112,8 @@ class MeshGradient extends Gradient {
 
     for (int i = 0; i < _shaderMaxPoints; i++) {
       controller.setVec2(paddedOffsets[i].dx, paddedOffsets[i].dy);
-    }
-
-    for (int i = 0; i < _shaderMaxPoints; i++) {
+      controller.setFloat(paddedStrengths[i]);
+      controller.setFloat(_preComputSigmaFactor(paddedSigmas[i]));
       controller.setVec4(
         paddedColors[i].r,
         paddedColors[i].g,
@@ -123,15 +122,11 @@ class MeshGradient extends Gradient {
       );
     }
 
-    for (int i = 0; i < _shaderMaxPoints; i++) {
-      controller.setFloat(paddedStrengths[i]);
-    }
-
-    for (int i = 0; i < _shaderMaxPoints; i++) {
-      controller.setFloat(paddedSigmas[i]);
-    }
-
     return controller.shader;
+  }
+
+  double _preComputSigmaFactor(double sigma) {
+    return 1 / (2 * sigma * sigma);
   }
 
   @override

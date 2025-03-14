@@ -1,4 +1,8 @@
 <!--dart pub publish --dry-run-->
+## 1.0.2
+
+- Improve shader compability with Impeller. Shader is still not working with Impeller OpenGLES (used in Android emulators).
+
 ## 1.0.1
 
 - Update README.
